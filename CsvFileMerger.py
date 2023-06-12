@@ -5,6 +5,7 @@ import argparse
 default_path = ".\csv"
 default_delimiter=";"
 default_output="merged.csv"
+default_columns = 2
 globalHeaderRow = []
 rowsWithoutHeader = []
 filenameColumn = []
@@ -12,9 +13,10 @@ filenameColumn = []
 def createArgParser():
     parser = argparse.ArgumentParser()
     # Add arguments
-    parser.add_argument('-path', type=str, default=default_path, help='The path to the folder conraining CSV files.', dest = 'path', )
-    parser.add_argument('-delimiter', type=str, default=default_delimiter, help='The delimiter used in the CSV files.',dest='delimiter')
-    parser.add_argument('-output', type=str, default=default_output, help='The path to the merged output CSV file.', dest='output')
+    parser.add_argument('-p','--path', type=str, help='The path to the folder conraining CSV files.', dest = 'path', required=True)
+    parser.add_argument('-d','--delimiter', type=str, default=default_delimiter, help='The delimiter used in the CSV files.',dest='delimiter')
+    parser.add_argument('-o','--output', type=str, default=default_output, help='The path to the merged output CSV file.', dest='output')
+    parser.add_argument('-c','--columns', type=int, default=default_columns, help='The number of columns from the inputs CSV files that will be written into export CSV file.', dest='columns')
     return parser
         
 if __name__ == "__main__":
@@ -31,10 +33,10 @@ if __name__ == "__main__":
                 csvReader = csv.reader(file, delimiter=args.delimiter)
                 headerRow = next(csvReader)
                 if len(headerRow) > len(globalHeaderRow):
-                    globalHeaderRow = headerRow
+                    globalHeaderRow = headerRow[0:args.columns]
                 for row in csvReader:
                     filenameColumn.append(filename)                
-                    rowsWithoutHeader.append(row)
+                    rowsWithoutHeader.append(row[0:args.columns])
             continue
         else:
             continue
@@ -50,5 +52,4 @@ if __name__ == "__main__":
                 row.append("")
             
             row.append(filenameColumn[i])
-            print(row)
             csvWriter.writerow(row)
